@@ -2,8 +2,8 @@
   'use strict';
 
   const TAG = '[LF Extractor]';
-  const pdfjsCdn = 'https://mozilla.github.io/pdf.js/build/pdf.js';
-  const pdfjsWorkerCdn = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+  const pdfjsCdn = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.min.mjs';
+  const pdfjsWorkerCdn = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs';
 
   if (window.__LF_PDF_EXTRACTOR_RUNNING__) {
     console.log(TAG, 'already running');
@@ -40,13 +40,15 @@
   }
 
   async function loadScript(url) {
-    await new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
-      s.async = true;
+    const s = document.createElement('script');
+    s.type = 'module';
+    s.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+    s.async = true;
+    document.head.appendChild(s);
+    
+    return new Promise((resolve, reject) => {
       s.onload = resolve;
       s.onerror = () => reject(new Error('Failed to load ' + url));
-      (document.head || document.documentElement).appendChild(s);
     });
   }
 
@@ -79,6 +81,8 @@
       ui.set('Loading PDF.jsâ€¦');
       if (!window.pdfjsLib) {
         await loadScript(pdfjsCdn);
+        // Wait a bit for the module to load
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
       if (!window.pdfjsLib) throw new Error('PDF.js failed to load');
 

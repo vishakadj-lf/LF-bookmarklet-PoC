@@ -75,7 +75,30 @@
     }
     return pages.join('\n\n--- Page Break ---\n\n');
   }
-
+  async function analyzeTextWithAPI(text) {
+  try {
+    const response = await fetch('http://localhost:8000/api/v1/pdf/analyze-pdf-text', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: text,
+        contract_type: 'general'
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('API call failed:', error);
+    throw error;
+  }
+}
   (async () => {
     try {
       ui.set('Loading PDF.jsâ€¦');

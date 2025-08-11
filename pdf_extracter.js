@@ -124,16 +124,26 @@
         ui.set('Extracting text (first 5 pages)â€¦');
         const text = await extractFirst5PagesText(data);
 
-        ui.set('Analyzing text with regex patterns...');
+        ui.set('Analyzing text with advanced NLP...');
         try {
           const analysis = await analyzeTextWithAPI(text);
-          ui.set('🎯 Regex Analysis Complete!\n\n');
-          ui.append(`📋 Parties: ${analysis.parties}\n\n`);
+          ui.set('🎯 Contract Analysis Complete!\n\n');
+          ui.append(`📋 Parties Involved: ${analysis.parties}\n\n`);
           ui.append(`📄 Summary: ${analysis.summary}\n\n`);
-          ui.append(`🔍 Method: ${analysis.analysis_method}\n\n`);
-          ui.append(`📊 Stats: ${analysis.text_stats.word_count} words, ~${analysis.text_stats.estimated_pages} pages\n\n`);
-          ui.append(`💬 Message: ${analysis.message}\n\n`);
-          ui.append(`📝 Raw Text Preview (first 200 chars):\n${text.substring(0, 200)}...`);
+          ui.append(`📋 Document Type: ${analysis.document_type}\n\n`);
+          ui.append(`🔍 Analysis Method: ${analysis.analysis_method}\n\n`);
+          ui.append(`⭐ Quality Score: ${analysis.quality_score}/1.0\n\n`);
+          ui.append(`📊 Stats: ${analysis.text_stats.word_count} words, ~${analysis.text_stats.estimated_pages} pages\n`);
+          ui.append(`   Entities Found: ${analysis.text_stats.entities_found}\n`);
+          ui.append(`   Sections: ${analysis.text_stats.sections_identified}\n\n`);
+          
+          // Show detailed party information if available
+          if (analysis.detailed_parties && analysis.detailed_parties.length > 0) {
+            ui.append(`🔍 Detailed Party Analysis:\n`);
+            analysis.detailed_parties.forEach((party, index) => {
+              ui.append(`   ${index + 1}. ${party.name} (${party.source}, confidence: ${party.confidence})\n`);
+            });
+          }
         } catch (error) {
           ui.set('❌ Analysis failed. Showing raw text instead.\n\n');
           ui.append(text || '(No text extracted)');

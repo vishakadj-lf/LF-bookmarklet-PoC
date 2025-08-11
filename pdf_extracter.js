@@ -126,7 +126,13 @@
 
         ui.set('Analyzing text with advanced NLP...');
         try {
+          console.log('🔍 [LF Extractor] Starting API call...');
+          console.log('📡 [LF Extractor] API URL:', 'http://localhost:8000/api/v1/pdf/analyze-pdf-text');
+          console.log('📄 [LF Extractor] Text length:', text.length);
+          
           const analysis = await analyzeTextWithAPI(text);
+          console.log('✅ [LF Extractor] API call successful:', analysis);
+          
           ui.set('🎯 Contract Analysis Complete!\n\n');
           ui.append(`📋 Parties Involved: ${analysis.parties}\n\n`);
           ui.append(`📄 Summary: ${analysis.summary}\n\n`);
@@ -145,8 +151,18 @@
             });
           }
         } catch (error) {
-          ui.set('❌ Analysis failed. Showing raw text instead.\n\n');
-          ui.append(text || '(No text extracted)');
+          console.error('❌ [LF Extractor] API call failed:', error);
+          console.error('❌ [LF Extractor] Error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+          });
+          
+          ui.set('❌ Analysis failed. Error details:\n\n');
+          ui.append(`Error: ${error.message}\n\n`);
+          ui.append(`Type: ${error.name}\n\n`);
+          ui.append(`Showing raw text instead:\n\n`);
+          ui.append(text.substring(0, 500) + (text.length > 500 ? '...' : ''));
         }
       } catch (e) {
         fail('Extraction error', e);
